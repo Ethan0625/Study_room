@@ -1,3 +1,5 @@
+# SELCET
+# https://programmers.co.kr/learn/courses/30/parts/17042
 # 모든 레코드 조회하기
 SELECT * FROM ANIMAL_INS;
 
