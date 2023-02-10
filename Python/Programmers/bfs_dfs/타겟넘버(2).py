@@ -1,3 +1,4 @@
+# 이전 풀이
 from collections import deque
 def solution(numbers, target):
     '''
@@ -21,4 +22,25 @@ def solution(numbers, target):
             if tmp==target:
                 answer+=1
     
+    return answer
+
+#변경 풀이
+def solution(numbers, target):
+    '''
+    0부터 시작 +1 -1을 한 결과를 전부 group안에 넣어둠
+    bfs에 가까움
+    전체 과정을 추적함
+    '''
+    group = [[0]]
+    
+    
+    for j in range(len(numbers)):
+        answer = group.pop()
+        tmp = []
+        for k in answer:
+            tmp.append(k+numbers[j])
+            tmp.append(k-numbers[j])
+        group.append(tmp)
+    
+    answer = group[-1].count(target)
     return answer
