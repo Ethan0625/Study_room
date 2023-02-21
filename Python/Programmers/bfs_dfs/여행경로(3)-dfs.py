@@ -20,6 +20,7 @@ def solution(tickets):
 
 # 비슷한 개념 활용한 풀이
 # 1. 그래프 생성
+def solution(tickets):
     routes = dict()
 
     for (start, end) in tickets:
