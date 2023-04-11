@@ -139,4 +139,3 @@ def solution(n,k):
 					
 		return answer
 		```
-
