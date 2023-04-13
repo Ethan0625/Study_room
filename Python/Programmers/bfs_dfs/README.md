@@ -146,3 +146,77 @@ def solution(numbers, target):
     answer = group[-1].count(target)
     return answer
 ```
+
+- 예시문제 : <img src ="https://school.programmers.co.kr/assets/bi-symbol-light-49a242793b7a8b540cfc3489b918e3bb2a6724f1641572c14c575265d7aeea38.png" width="10" /> [프로그래머스 등산코스 정하기-level3](https://school.programmers.co.kr/learn/courses/30/lessons/118669)
+    ``` 
+    문제 설명
+    XX산은 n개의 지점으로 이루어져 있습니다. 
+    각 지점은 1부터 n까지 번호가 붙어있으며, 출입구, 쉼터, 혹은 산봉우리입니다. 
+    각 지점은 양방향 통행이 가능한 등산로로 연결되어 있으며, 
+    서로 다른 지점을 이동할 때 이 등산로를 이용해야 합니다. 
+    이때, 등산로별로 이동하는데 일정 시간이 소요됩니다.
+
+    등산코스는 방문할 지점 번호들을 순서대로 나열하여 표현할 수 있습니다.
+    예를 들어 1-2-3-2-1 으로 표현하는 등산코스는 1번지점에서 출발하여 
+    2번, 3번, 2번, 1번 지점을 순서대로 방문한다는 뜻입니다.
+    등산코스를 따라 이동하는 중 쉼터 혹은 산봉우리를 방문할 때마다 
+    휴식을 취할 수 있으며, 휴식 없이 이동해야 하는 시간 중 
+    가장 긴 시간을 해당 등산코스의 intensity라고 부르기로 합니다.
+
+    당신은 XX산의 출입구 중 한 곳에서 출발하여 산봉우리 중 한 곳만 방문한 뒤 다시 원래의 출입구로 돌아오는 등산코스를 정하려고 합니다. 다시 말해, 등산코스에서 출입구는 처음과 끝에 한 번씩, 산봉우리는 한 번만 포함되어야 합니다.
+    당신은 이러한 규칙을 지키면서 intensity가 최소가 되도록 등산코스를 정하려고 합니다.
+    ```
+
+    ### 참조 풀이
+    - 풀이에 실패하여 다른사람의 풀이를 참조하여 풀었음
+    - 해당 문제는 다익스트라를 활용하여 풀이하여야 함.
+    ```python
+    import heapq
+    from math import inf
+    def solution(n, paths, gates, summits):
+        # 경로를 찾는 문제
+        # g->s->g로 돌아올 때 드는 costs 중 max값이 intensity
+        # floyd_warshall을 활용해본다.
+        
+        # 간선 정리 (양방향)
+        graph = [[] for _ in range(n + 1)]
+        for i, j, w in paths:
+            graph[i].append([j, w])
+            graph[j].append([i, w])
+
+        # 산봉우리 판별
+        is_summit = [False] * (n + 1)
+        for summit in summits:
+            is_summit[summit] = True
+
+        # gates 모두 시작 위치
+        distance = [inf] * (n + 1)
+        queue = []
+        for gate in gates:
+            distance[gate] = 0
+            heapq.heappush(queue, [0, gate])
+
+        # 다익스트라
+        while queue:
+            d, i = heapq.heappop(queue)
+            # 산봉우리면 바로 continue
+            # 이렇게 해야 두 개 이상의 산봉우리를 방문하지 않는다.
+            if distance[i] < d or is_summit[i]:
+                continue
+            for j, dd in graph[i]:
+                dd = max(distance[i], dd)
+                if distance[j] > dd:
+                    distance[j] = dd
+                    heapq.heappush(queue, [dd, j])
+
+        # 결과
+        # 거리가 같으면 산봉우리의 번호가 작은 것을 출력해야 하므로
+        # 산봉우리를 정렬하여 살펴보자.
+        result = [-1, inf]
+
+        for summit in sorted(summits):
+            if distance[summit] < result[1]:
+                result[0] = summit
+                result[1] = distance[summit]
+        return result
+    ```

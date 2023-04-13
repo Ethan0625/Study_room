@@ -139,3 +139,71 @@ def solution(n,k):
 					
 		return answer
 		```
+### 다익스트라
+- 대표문제 : <img src ="https://school.programmers.co.kr/assets/bi-symbol-light-49a242793b7a8b540cfc3489b918e3bb2a6724f1641572c14c575265d7aeea38.png" width="10" /> [프로그래머스 등산코스 정하기-level3](https://school.programmers.co.kr/learn/courses/30/lessons/118669)
+- 개념 :  
+	- 특정한 노드에서 출발하여 다른 노드로 가는 각각의 최단 경로를 구해주는 알고리즘
+	- 음의 간선이 없을 때 정상적으로 동작한다.
+	- 그리디 알고리즘으로 분류되지만, 경우에 따라서 bfs문제에 활용 될 수 있다.
+- 동작과정 :  
+	
+	```
+	1. 각 노드와 연결 된 노드,비용에 대한 그래프를 만들어 준다.(defaultdict나 list 활용)
+	2. 출발 점에 대해서 최단 거리 테이블을 초기화 한다.(ex. [inf, inf, 0, inf, inf] -> from math import inf)
+	3. heapq 라이브러리를 활용하여 출발 노드를 heap에 넣어준다.
+	4. 입구와 출구가 정해져 있는 경우, 출구를 판별하기 위한 set이나 True, False로 구분 된 리스트를 만들어 판별한다.
+	5. while문을 돌면서 heap에서 heapq.heappop()을 통해 시작점부터 돌기 시작한다.
+	6. pop된 노드와 연결 된 노드를 확인하여 기존의 비용과 비교 후, 비용이 작으면 업데이트 한다.
+	7. 5번과 6번을 반복한다.
+	```
+- 예시문제 풀이
+	```python
+    import heapq
+    from math import inf
+    def solution(n, paths, gates, summits):
+        # 경로를 찾는 문제
+        # g->s->g로 돌아올 때 드는 costs 중 max값이 intensity
+        # floyd_warshall을 활용해본다.
+        
+        # 간선 정리 (양방향)
+        graph = [[] for _ in range(n + 1)]
+        for i, j, w in paths:
+            graph[i].append([j, w])
+            graph[j].append([i, w])
+
+        # 산봉우리 판별
+        is_summit = [False] * (n + 1)
+        for summit in summits:
+            is_summit[summit] = True
+
+        # gates 모두 시작 위치
+        distance = [inf] * (n + 1)
+        queue = []
+        for gate in gates:
+            distance[gate] = 0
+            heapq.heappush(queue, [0, gate])
+
+        # 다익스트라
+        while queue:
+            d, i = heapq.heappop(queue)
+            # 산봉우리면 바로 continue
+            # 이렇게 해야 두 개 이상의 산봉우리를 방문하지 않는다.
+            if distance[i] < d or is_summit[i]:
+                continue
+            for j, dd in graph[i]:
+                dd = max(distance[i], dd)
+                if distance[j] > dd:
+                    distance[j] = dd
+                    heapq.heappush(queue, [dd, j])
+
+        # 결과
+        # 거리가 같으면 산봉우리의 번호가 작은 것을 출력해야 하므로
+        # 산봉우리를 정렬하여 살펴보자.
+        result = [-1, inf]
+
+        for summit in sorted(summits):
+            if distance[summit] < result[1]:
+                result[0] = summit
+                result[1] = distance[summit]
+        return result
+    ```
